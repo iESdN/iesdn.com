@@ -1,0 +1,62 @@
+
+// Toggle hamburger icon and close icon
+const toggle = document.getElementById('menu-toggle');
+const hamburger = document.querySelector('.hamburger');
+const icon = document.querySelector('.hamburger-icon');
+const closeIcon = document.querySelector('.close-icon');
+
+toggle.addEventListener('change', () => {
+  hamburger.classList.toggle('open', toggle.checked);
+  icon.style.display = toggle.checked ? 'none' : 'inline';
+  closeIcon.style.display = toggle.checked ? 'inline' : 'none';
+});
+
+// Submenu delay behavior (desktop)
+document.querySelectorAll('.has-submenu').forEach(item => {
+  let timeout;
+  const submenu = item.querySelector('.submenu');
+
+  function openSubmenu() {
+    clearTimeout(timeout);
+    submenu.style.display = 'flex';
+    submenu.style.flexDirection = 'column';
+  }
+
+  function closeSubmenu() {
+    timeout = setTimeout(() => {
+      if (!item.matches(':hover') && !submenu.matches(':hover')) {
+        submenu.style.display = 'none';
+      }
+    }, 100);
+  }
+
+  item.addEventListener('mouseenter', openSubmenu);
+  item.addEventListener('mouseleave', closeSubmenu);
+  submenu.addEventListener('mouseenter', openSubmenu);
+  submenu.addEventListener('mouseleave', closeSubmenu);
+});
+
+// Double-tap submenu logic for mobile
+document.querySelectorAll('.has-submenu > a').forEach(link => {
+  let tapped = false;
+
+  link.addEventListener('click', (e) => {
+    const isMobile = window.innerWidth <= 768;
+    const submenu = link.nextElementSibling;
+
+    if (isMobile && submenu && submenu.classList.contains('submenu')) {
+      if (!tapped) {
+        e.preventDefault(); // Block navigation on first tap
+        // Close any open submenus
+        document.querySelectorAll('.submenu.active').forEach(el => {
+          if (el !== submenu) el.classList.remove('active');
+        });
+        submenu.classList.add('active');
+        tapped = true;
+
+        // Reset tap after short time
+        setTimeout(() => tapped = false, 500);
+      }
+    }
+  });
+});

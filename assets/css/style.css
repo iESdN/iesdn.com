@@ -1,0 +1,1026 @@
+:root{
+  --blue: #0A3161; /* Old Glory Blue */
+  --red:  #B31942; /* Old Glory Red  */
+}
+
+/* ===== Base ===== */
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body { font-family: sans-serif; line-height: 1.2; margin: 0; }
+a { color: var(--blue); text-decoration: none; }
+
+@font-face{
+  font-family: "Freehand";
+  src: url("/assets/fonts/freehand-v32-latin-regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*--------------------------------------------------MENU--------------------------------------------------*/
+/* ===== Mobile UX: first tap opens (overlay), second tap navigates ===== */
+@media (max-width:700px){
+  .burger-close{ display:none; } /* if you don’t want a visible X */
+
+  
+  /* ===== Hamburger (checkbox) ===== */
+#menu-toggle { position: absolute; opacity: 0; width: 0; height: 0; }
+
+.burger{
+  position: relative;
+  width: 44px; height: 44px;
+  cursor: pointer; display: inline-block; margin: 10px;
+  color: var(--blue, #0A3161);               /* set the color here */
+}
+.burger span{
+  position: absolute; left: 10px; right: 10px;
+  height: 3px; background: currentColor;     /* bars follow .burger color */
+  border-radius: 2px;
+  transition: transform .25s ease, top .25s ease, opacity .2s ease;
+}
+.burger .line1{ top: 12px; }
+.burger .line2{ top: 20px; }
+.burger .line3{ top: 28px; }
+
+#menu-toggle:checked + label.burger .line1{ top: 20px; transform: rotate(45deg); }
+#menu-toggle:checked + label.burger .line2{ opacity: 0; }
+#menu-toggle:checked + label.burger .line3{ top: 20px; transform: rotate(-45deg); }
+
+#menu-toggle:focus-visible + label.burger{
+  outline: 2px solid currentColor; outline-offset: 4px; border-radius: 6px;
+}
+
+  #menu-toggle:checked ~ nav { display: block; }
+
+  nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    width: max-content;
+    background-color: #ffffff;
+    z-index: 1000;
+    border: solid 1px var(--blue);
+    border-radius: 10px;
+    margin-top: 0px; /* space below the burger */
+    left: 10px;
+    top: 10px;              /* space below the burger */
+  }
+  
+  nav[aria-label="Primary"] li {
+    position: relative;
+    margin: 0;
+  }
+
+  nav[aria-label="Primary"] a {
+    display: block;
+    padding: 5px 10px;
+    font-size: 1rem;
+    color: var(--blue);
+  }
+  nav[aria-label="Primary"] a:hover {
+    background: #e9e9e9;
+  }
+
+  /* ===== Submenus (RADIO logic: one open at a time) ===== */
+  /* Order per item: <a> + <input[type=radio].sub-toggle> + <label.chev-open> + <label.chev-close> + <ul.submenu> */
+  nav[aria-label="Primary"] .sub-toggle {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Space for right-side chevron button */
+  nav[aria-label="Primary"] li > a {
+    padding-right: 56px;
+    padding-top: 10px; /* space for chevron */
+  }
+
+  /* Chevron buttons */
+  .chevron{
+    position: absolute;
+    right: auto;
+    top: 0px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    border: 1px solid var(--red);
+    border-radius: 8px;
+    font-size: 28px; line-height: 1;
+    cursor: pointer; user-select: none; z-index: 3; background: #fff;
+    padding-bottom: 10px; /* space for chevron */
+    padding-top: 7px; /* space for chevron */
+    left: 129px;             /* space below the burger */
+  }
+  nav[aria-label="Primary"] .chev-open::before  { content: "▸"; color: var(--blue); padding-bottom: 7px;}
+  nav[aria-label="Primary"] .chev-close::before { content: "x"; color: var(--red);} /* use "▾" if you prefer a down-arrow */
+
+  /* Closed state: show OPEN chevron only */
+  .sub-toggle + .chev-open { display: inline-flex; }
+  .sub-toggle + .chev-open + .chev-close { display: none; }
+  .sub-toggle + .chev-open + .chev-close + .submenu { display: none; }
+
+  /* Open state: show CLOSE chevron + submenu */
+  .sub-toggle:checked + .chev-open { display: none; }
+  .sub-toggle:checked + .chev-open + .chev-close { display: inline-flex; }
+  .sub-toggle:checked + .chev-open + .chev-close + .submenu { display: block; }
+
+  /* Submenu list */
+  nav[aria-label="Primary"] .submenu {
+    margin: 20px 0 6px 10px;
+    padding-left: 0;
+    padding: 0;
+    border: 1px solid var(--red);
+    border-radius: 6px;
+    left: 0px;
+    top: 25px;              /* space below the burger */
+  }
+
+  nav[aria-label="Primary"] .submenu a { display: block; padding: 10px 10px; font-size: 1rem;}
+  nav[aria-label="Primary"] .submenu a:hover { background: #e9e9e9; }
+
+  /* ===== UX: first tap opens (overlay), second tap navigates ===== */
+  nav[aria-label="Primary"] .has-sub { position: relative; }
+
+  /* Make the OPEN chevron cover the whole row on first tap */
+  nav[aria-label="Primary"] .has-sub > .chev-open{
+    left: 0; right: 0; top: 0; height: 48px; width: auto;
+    border: 0; background: transparent; font-size: 0;
+  }
+  /* Draw the arrow on the right inside that overlay */
+  nav[aria-label="Primary"] .has-sub > .chev-open::before{
+    content: "▸";
+    position: absolute; right: 12px; top: 50%;
+    transform: translateY(-50%); font-size: 28px; line-height: 1;
+  }
+  /* Once open, overlay disappears so second tap hits the link */
+  nav[aria-label="Primary"] .sub-toggle:checked + .chev-open { display: none; }
+
+  /* ===== Tap-outside to close menu (mobile only) ===== */
+  .backdrop{
+    display: none;
+    position: fixed; inset: 0;
+    background: transparent;      /* or rgba(0,0,0,.25) to dim */
+    z-index: 1000;
+  }
+  #menu-toggle:checked ~ .backdrop { display: block; }
+}
+/* End ===== Mobile UX: first tap opens (overlay), second tap navigates ===== */
+
+/* ===== Desktop menu (no hamburger) ===== */
+@media (min-width:701px){
+
+    nav[aria-label="Primary"] > ul > li.has-sub { position: relative; }   /* parent anchor */
+
+
+  .has-sub:hover > .submenu,
+  .has-sub:focus-within > .submenu{ display:block; }
+
+  nav[aria-label="Primary"] > ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* hide mobile controls */
+  #menu-toggle,
+  .burger,
+  .burger-close,
+  .backdrop { display:none; }
+
+  /* show nav always */
+  nav{
+    display:block;
+    background: transparent;
+    border-top: 0;
+    padding: 0;
+  }
+
+  /* top-level layout */
+  nav > ul{
+    display:flex;
+    align-items:center;
+    gap: 24px;              /* space between top items */
+    margin:0;
+    padding:0;
+  }
+  nav > ul > li{
+    position:relative;
+    margin:0;
+  }
+  nav a{
+    display:block;
+    padding:10px 12px;
+    border-radius:6px;
+    font-size:16px;
+  }
+  nav a:hover,
+  nav a:focus-visible{
+    color: var(--red);
+  }
+
+  /* hide radios/chevrons; remove extra right padding */
+  .sub-toggle, .chevron{ display:none; }
+  li > a{ padding-right:12px; }
+
+  /* dropdowns */
+  /* GAPLESS, ANIMATED DROPDOWNS */
+  .submenu{
+    /* was: display:none; */
+    display:block;                 /* keep it block, we hide via opacity/visibility */
+    position:absolute;
+    top:100%;
+    right: 0;
+    min-width:220px;                  /* ← remove the gap that caused the flicker */
+    padding:8px;
+    list-style:none;
+    background:#fff;
+    border:1px solid var(--blue);
+    border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.08);
+    z-index:1000;
+
+    /* smooth show/hide without layout jumps */
+    opacity:0;
+    visibility:hidden;
+    transform: translateY(6px);    /* visual offset instead of margin-top */
+    transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+    pointer-events:none;           /* avoid accidental hover when hidden */
+  }
+
+  /* open on hover or keyboard focus */
+  .has-sub:hover > .submenu,
+  .has-sub:focus-within > .submenu{
+    opacity:1;
+    visibility:visible;
+    transform: translateY(0);
+    transition-delay: 0s;
+    pointer-events:auto;
+  }
+
+  /* OPTIONAL: tiny invisible bridge (belt & suspenders)
+     lets you cross a few pixels even if something shifts */
+  .has-sub{ position:relative; }
+  .has-sub::after{
+    content:"";
+    position:absolute; left:0; right:0; top:100%;
+    height:8px;                    /* hover “bridge” height */
+  }
+}
+  .submenu li{ margin:0; }
+  .submenu a{ padding:10px 12px; white-space:nowrap; }
+
+  /* caret indicator on roots that have submenus */
+  nav > ul > li.has-sub > a{
+    position: relative;
+    padding-right: 28px;                 /* room for the caret */
+  }
+  nav > ul > li.has-sub > a::after{
+    content: "▾";                   /* down caret */
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-45%);         /* vertical optical align */
+    font-size: 1.5rem;                    /* scales with link text */
+    line-height: 1;
+    color: var(--blue);
+    opacity: .75;
+    pointer-events: none;                /* don’t steal hover */
+    transition: transform .15s ease, color .15s ease, opacity .15s ease;
+  }
+
+  /* hover/focus: brighten + flip to up */
+  .has-sub:hover > a::after,
+  .has-sub:focus-within > a::after{
+    opacity: 1;
+    color: var(--red);
+    transform: translateY(-45%) rotate(180deg); /* becomes ▴ */
+  }
+
+/* End ===== Desktop menu (no hamburger) ===== */
+
+/* === Global a11y/UX polish (applies to all breakpoints) === */
+a:focus-visible,
+.chevron:focus-visible,
+.burger:focus-visible,
+.burger-close:focus-visible {
+  outline: 3px solid #4c9ffe;
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine){
+  .concept-card:hover{ transform: translateY(-5px); box-shadow: 0 0 10px rgba(0,51,102,.15); }
+  .project-card:hover{ transform: translateY(-5px); box-shadow: 0 0 12px rgba(0,51,102,.1); }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .concept-card:hover,
+  .project-card:hover{ transform: none !important; }
+  * { transition: none !important; }
+}
+
+a, .chevron, .burger { touch-action: manipulation; }
+
+
+/* subtle tap highlight on touch devices */
+a, .chevron, .burger, .burger-close {
+  -webkit-tap-highlight-color: rgba(0,0,0,.12);
+}
+
+@media (max-width:700px){
+  nav[aria-label="Primary"] > ul > li.has-sub > a::after { content: none !important; }
+}
+/* End === Global a11y/UX polish (applies to all breakpoints) === */
+/* ===== MOBILE: Root menu position (only placement) ===== */
+@media (max-width: 700px){
+  .site-header{ position: relative; }
+
+  /* Knobs — tweak these values to move/size the panel */
+  .site-header{
+    --menu-top: calc(100% + 35px);   /* distance from header top edge */
+    --menu-left: 0px;               /* left offset (set to 'auto' to align right) */
+    --menu-right: 12px;              /* right offset (set to 'auto' to align left) */
+    --menu-width: auto;              /* e.g., auto | max-content | min(560px, 92vw) */
+    --menu-transform: none;          /* e.g., translateX(-50%) for centered */
+    --menu-z: 1003;                  /* stacking above flag etc. */
+  }
+
+  /* Base placement (hidden by default) */
+  .site-header nav[aria-label="Primary"]{
+    position: absolute;
+    top: var(--menu-top);
+    left: var(--menu-left);
+    right: var(--menu-right);
+    width: var(--menu-width);
+    transform: var(--menu-transform);
+    display: none;
+    z-index: var(--menu-z);
+  }
+
+  /* Open on toggle (no DOM changes required) */
+  .site-header:has(#menu-toggle:checked) nav[aria-label="Primary"]{ display: block; }
+  .site-header nav[aria-label="Primary"]:focus-within{ display: block; } /* stays open while tabbing */
+}
+
+/*---------------------------------------------------END MENU--------------------------------------------------*/
+
+/*============================================= TABLET MENU & HEADER PATCH!!! =============================================*/
+
+/* Desktop: keep current hover/focus behavior */
+/* Desktop: hide mobile controls only (let the animated dropdown handle itself) */
+@media (min-width:701px){
+  nav[aria-label="Primary"] .sub-toggle,
+  nav[aria-label="Primary"] .chev-open,
+  nav[aria-label="Primary"] .chev-close{ display:none; }
+}
+
+
+/* Desktop-width TOUCH devices: 1st tap opens, 2nd tap navigates */
+@media (min-width:701px) and (hover: none), (min-width:701px) and (pointer: coarse){
+  /* re-enable the checkbox + overlay label */
+  nav[aria-label="Primary"] li.has-sub{ position:relative; }
+  nav[aria-label="Primary"] .sub-toggle{ position:absolute; opacity:0; display:block; }
+  nav[aria-label="Primary"] li.has-sub > .chev-open{
+    display:block;
+    position:absolute; inset:0; z-index:3;  /* overlay the whole row */
+    background:transparent; border:0; font-size:0; cursor:pointer;
+  }
+
+  /* open states also when checkbox is checked */
+  nav[aria-label="Primary"] li.has-sub > .sub-toggle:checked ~ .submenu{ display:block; }
+
+  /* when open, remove the overlay so next tap hits the link */
+  nav[aria-label="Primary"] li.has-sub > .sub-toggle:checked + .chev-open{ display:none; }
+}
+
+/* Tablet: reduce distance between top-level menu items */
+@media (min-width:701px) and (max-width: 1800px){
+  .right-top nav[aria-label="Primary"] > ul{ gap: 0px; } /* was 16px */
+  /* optional, if still tight: */
+  /* .right-top nav[aria-label="Primary"] > ul > li > a{ padding:6px 8px; } */
+
+  .header-right{ display: contents; }          /* let children sit on the grid */
+  .right-bottom{ 
+    grid-column: 3; 
+    grid-row: 1; 
+    justify-self: end; 
+    align-self: center;
+    margin-right: 10px;
+   /* = align-self:center + justify-self:center */
+    margin-left: 0;
+  }
+}
+
+/*============================================== END TABLET MENU PATCH!!! =============================================*/
+
+/*============================================= HEADER ======================================================*/
+/*============================================= HEADER - MOBILE =============================================*/
+@media (max-width:700px){
+  .site-header{ --menu-width: min(92vw, max-content); }
+
+  .site-header .header-grid{
+    display:grid; grid-template-columns: 1fr 150px 1fr; align-items:center;
+  }
+  .header-left{ display:none; }
+
+  .header-center.logo{ grid-column:2; justify-self:center; margin-top:5px; }
+  .logo-img{ width:150px; height:150px; display:block; }
+
+  .header-right{
+    grid-column:3; justify-self:end; align-self:stretch;
+    display:flex; flex-direction:column; align-items:flex-end; min-height:150px;
+  }
+  .right-top{ margin-top:auto; }
+
+  .lang img{ width:48px; height:auto; display:block; margin-right:20px; margin-top:5px; }
+
+  .right-top #menu-toggle + label, .right-top .burger{
+    width:70px; height:60px; position:relative; display:inline-block; margin-bottom:0; padding-bottom:0;
+  }
+  .right-top #menu-toggle + label span, .right-top .burger span{
+    position:absolute; left:12px; right:12px; height:4px;
+  }
+  .right-top #menu-toggle + label span:nth-child(1), .right-top .burger span:nth-child(1){ top:18px; }
+  .right-top #menu-toggle + label span:nth-child(2), .right-top .burger span:nth-child(2){ top:32px; }
+  .right-top #menu-toggle + label span:nth-child(3), .right-top .burger span:nth-child(3){ top:47px; }
+
+  .right-top #menu-toggle:checked + label span:nth-child(1){ top:50%; transform:translateY(-50%) rotate(45deg); }
+  .right-top #menu-toggle:checked + label span:nth-child(2){ opacity:0; }
+  .right-top #menu-toggle:checked + label span:nth-child(3){ top:50%; transform:translateY(-50%) rotate(-45deg); }
+}
+
+/*============================================= HEADER - DESKTOP =============================================*/
+@media (min-width:701px){
+  .site-header .header-grid{
+    display:grid;
+    grid-template-columns: 1fr 150px 1fr;
+    grid-template-rows: auto auto;
+    align-items:center;
+    row-gap:8px;
+    margin-top: 10px;
+  }
+
+  .header-left{
+    display:grid; gap:4px; row-gap:4px; align-content:center;
+    grid-column:1; grid-row:1; margin-top:-4px; margin-left:5px;
+    place-self:center;
+  }
+  .motto-item{ margin:0; line-height:1.25; font-family: "Freehand", system-ui, sans-serif; }
+  .motto-1{ color:var(--blue); margin-left:30px; }
+  .motto-2{ color:var(--blue); margin-left:0; }
+  .motto-3{ color:var(--red);  margin-left:200px; }
+
+  .header-center.logo{ grid-column:2; grid-row:1; justify-self:center; }
+  .logo-img{ width:150px; height:150px; display:block; }
+
+  .header-right{ display: contents; }
+
+  /* right/top cell: flag — no magic margin */
+  .right-bottom{
+    grid-column:3; grid-row:1;
+    justify-self:end; align-self:center;
+    margin:0; display:block;
+    margin-right: 10px; /* space between flag and menu */
+  }
+  .lang img{ width:40px; height:auto; display:block; }
+
+  .right-top{ grid-column:1 / -1; grid-row:2; justify-self:center; }
+
+  #menu-toggle, .burger, .backdrop{ display:none !important; }
+  .right-top nav[aria-label="Primary"]{ display:block; position:static; }
+  .right-top nav[aria-label="Primary"] > ul{
+    list-style:none; margin:0; padding:0; display:flex; gap:16px; justify-content:center;
+  }
+  .right-top nav[aria-label="Primary"] a{ display:block; padding: 10px 12px; }
+
+  nav[aria-label="Primary"] > ul > li.has-sub > a{ position: relative; padding-right: 28px; }
+}
+/*============================================== END HEADER =============================================*/
+
+/*============================================== BREADCRUMBS ==========================================================*/
+.breadcrumbs{
+  position: relative;
+  border-top: solid 1px var(--blue);
+  border-bottom: 0;
+  margin-top: 5px;
+  padding: 5px 0 5px 5px;
+}
+.breadcrumbs::after{
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+  background: var(--red);
+  box-shadow: 0 -2px 0 var(--blue);
+  pointer-events: none;
+}
+
+@media (max-width:700px){
+  .breadcrumbs ol{
+    list-style:none; margin:0; padding:0;
+    display:flex; flex-wrap:nowrap; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    white-space:nowrap; gap:0;
+  }
+  .breadcrumbs li{ display:inline-flex; align-items:center; flex:0 0 auto; }
+  .breadcrumbs li + li::before{ content:"›"; margin:0 6px; opacity:1; padding-bottom:1px; }
+  .breadcrumbs a{ color:var(--blue); text-decoration:none; padding-bottom:1px; }
+  .breadcrumbs a:hover, .breadcrumbs [aria-current="page"]{
+    display:inline-flex; align-items:center; flex:0 0 auto; text-decoration:none;
+    font-weight:600; color:var(--red);
+  }
+}
+
+@media (min-width:701px){
+  .breadcrumbs ol{
+    list-style:none; margin:0 auto; padding:0; display:flex; flex-wrap:wrap; gap:0;
+    max-width:1650px;
+  }
+  .breadcrumbs li{ display:inline-flex; align-items:center; }
+  .breadcrumbs li + li::before{ content:"›"; margin:0 8px; opacity:1; padding-bottom:2px; }
+  .breadcrumbs a{ color:var(--blue); text-decoration:none; padding-top:9px; }
+  .breadcrumbs a:hover, .breadcrumbs a:focus-visible{ text-decoration:underline; }
+  .breadcrumbs [aria-current="page"]{ font-weight:600; color:var(--red); }
+}
+/*============================================== END BREADCRUMBS =======================================================*/
+
+/* ================================================ FOOTER ============================================================== */
+.site-footer{
+  background-color: var(--blue); /* Old Glory Blue */
+  color:#fff;
+  font-family:system-ui, sans-serif;
+  padding: 0 10px;
+}
+.footer-container{
+  max-width:1800px; margin:0 auto; display:flex; flex-wrap:wrap; gap:1rem;
+  justify-content:space-between; align-items:flex-start;
+}
+.footer-column{
+  flex:1 1 0; border-right:1px solid rgba(255,255,255,.4); padding-right:1rem;
+}
+.footer-column:last-child{ border-right:0; padding-right:0; }
+.footer-column h2{
+  font-size:1rem; text-decoration:underline; margin-bottom:.75rem; color:#fff;
+  text-transform:uppercase; letter-spacing:.5px;
+}
+.footer-column ul{ list-style:none; margin:0; padding:0; }
+.footer-column li{ margin-bottom:.5rem; }
+.footer-column a{ color:#fff; text-decoration:none; font-size:.95rem; transition:color .2s ease; }
+.footer-column a:hover{ color:#B31942; }
+
+.footer-column.logo{
+  flex:0 0 420px; display:flex; flex-direction:column; align-items:center; text-align:center;
+}
+.footer-column.logo img{ max-width:100%; height:auto; display:block; margin-top:5px; }
+
+.footer-official{ margin-top:0; font-size:1rem; color:#fff; }
+
+.footer-bottom p{
+  text-align:center; font-size:.8rem; color:#fff;
+  border-top:1px solid rgba(255,255,255,.2);
+  padding-top:1rem; padding-bottom:20px;
+}
+
+@media (max-width:700px){
+  .site-footer{ padding: 1px; }
+  .footer-container{ flex-direction:column; align-items:center; text-align:center; }
+  .footer-column{
+    flex:1 1 100%; max-width:100%;
+    border-right:0; padding-right:0; border-bottom:1px solid rgba(255,255,255,.4);
+  }
+  .footer-column.logo{ flex:1 1 100%; }
+  .footer-official{ margin-top:1rem; }
+}
+/*================================================== END FOOTER ===========================================================*/
+
+/*================================================== MAIN CONTENT ===========================================================*/
+
+/* Global heading control */
+body, h1, h2, h3, h5, h6, p { font-family: system-ui, sans-serif; color: var(--blue); }
+h1{ font-size:2.2rem; line-height:1.3; font-weight:700; color: var(--blue); }
+
+section h1, article h1, nav h1, aside h1 { font-size:2.2rem; }
+
+.hero-line{ border-top:1px solid var(--red); }
+.hero{
+  margin-top:1px; padding:4rem 2rem; background-color:#fafafa;
+  border-bottom:2px solid #ccc; text-align:center; border-top:1px solid var(--blue);
+}
+/* only when no breadcrumb is rendered (home, etc.) */
+body.no-crumbs .hero-line{ border-top:1px solid var(--red); }
+body.no-crumbs .hero{ border-top:1px solid var(--blue); }
+/* ensure they don’t appear when crumbs exist */
+body.has-crumbs .hero-line{ border-top:0; }
+body.has-crumbs .hero{ border-top:0; }
+
+.hero-container{ max-width:1200px; margin:0 auto; }
+.hero-image{ margin-bottom:2rem; }
+.hero-image img{ max-width:100%; height:auto; border-radius:8px; }
+.hero h1{ font-size:1.6rem; margin-bottom:1rem; font-weight:700; color: var(--blue); }
+.hero p{ font-size:1.3rem; line-height:1.6; margin-bottom:2rem; }
+.hero-cta-buttons{ display:flex; justify-content:center; gap:1.5rem; flex-wrap:wrap; }
+
+/* === SUB-HERO SECTION === */
+.sub-hero{
+  background-color:#f5f5f5; padding:2.5rem 1.5rem; border-bottom:1px solid #ccd6dd;
+  text-align:center; font-weight:400;
+}
+.sub-hero-container{ max-width:900px; margin:0 auto; }
+.sub-hero p{ font-size:1.2rem; line-height:1.6; color:var(--blue); }
+
+/* === CONCEPTS GRID SECTION === */
+.concepts-preview{ padding:2rem 2rem; background-color:#fff; border-bottom:1px solid #ddd; }
+.concepts-container{ max-width:1200px; margin:0 auto; text-align:center; }
+.concepts-container h2{ font-size:2rem; margin-top:1px; margin-bottom:3rem; color: var(--blue); }
+.concepts-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; }
+
+.concept-card{
+  background-color:#fff; padding:1rem; border-radius:10px; border:1px solid var(--blue);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.concept-card:hover{ transform:translateY(-5px); box-shadow:0 0 10px rgba(0,51,102,.15); }
+.concept-card img{ width:100%; height:auto; border-radius:6px; margin-bottom:1rem; box-shadow:0 0 4px rgba(0,0,0,.05); }
+.concept-card h3{ margin-bottom:.8rem; font-size:1.2rem; }
+.concept-card p{ font-size:.95rem; line-height:1.4; }
+.concept-summary{ font-weight:600; font-style:italic; }
+
+/* Red Button CTA — consistent site-wide */
+.concept-button, .project-button, .section-button{
+  display:inline-block; margin-top:1rem; padding:.6rem 1.2rem;
+  font-size:.9rem; color:#fff; background-color:#B31942;
+  text-decoration:none; border-radius:5px; border:1px solid transparent;
+  transition: background-color .2s ease, color .2s ease, border .2s ease;
+}
+.concept-button:hover, .project-button:hover, .section-button:hover{
+  background:transparent; color:#B31942; border:1px solid #B31942;
+}
+
+/* === R&D SECTION === */
+.project-tile.full{
+  text-align:center; padding:2.5rem; background-color:#fff; border-radius:8px;
+  box-shadow:0 0 8px rgba(0,0,0,.05); border:1px solid var(--blue); max-width:960px; margin:2rem auto;
+}
+.project-tile.full h3{ font-size:1.8rem; margin-bottom:1rem; }
+.project-tile.full p{ font-size:1.05rem; line-height:1.6; margin-bottom:1.2rem; }
+
+.project-tile h4{ font-size:1.3rem; color: var(--blue); }
+
+.project-row.double{ display:flex; gap:2rem; margin-bottom:2rem; }
+.project-tile.half{
+  flex:1 1 calc(50% - 1rem); background-color:#fff; padding:2rem; border-radius:8px;
+  box-shadow:0 0 5px rgba(0,0,0,.05); text-align:left; border:1px solid var(--blue);
+}
+
+.rnd-section{ background-color:#f9f9f9; padding:4rem 2rem; border-top:1px solid #ddd; border-bottom:1px solid #ddd; }
+.rnd-container{ max-width:1200px; margin:0 auto; }
+.rnd-container h2{ text-align:center; font-size:2rem; margin-bottom:3rem; color: var(--blue); }
+
+.rnd-section .project-row{ display:flex; justify-content:center; gap:2rem; margin-bottom:2rem; }
+.rnd-section .project-tile.full{ flex:1 1 100%; max-width:960px; }
+.rnd-section .project-tile.half{ flex:1 1 calc(50% - 1rem); max-width:580px; }
+.rnd-section .project-tile{
+  background:#fff; padding:2rem; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,.05); text-align:center; min-height:150px;
+}
+
+/* === PROJECTS GRID === */
+.projects-preview{ background-color:#fff; padding:4rem 2rem; border-bottom:1px solid #ddd; }
+.projects-container{ max-width:1200px; margin:0 auto; text-align:center; }
+
+.philosophy-container{ max-width: 1400px; margin:0 auto; }
+.philosophy-quote{
+  font-family: system-ui, sans-serif; font-size:1.8rem; color: var(--blue);
+  margin:0 auto 1rem; line-height:1.6; text-align:center;
+}
+.philosophy-signature{ font-size:1rem; margin-bottom:2rem; font-style:italic; text-align:center; }
+
+/* CTA */
+.section-cta{ margin-top:3rem; text-align:center; padding-bottom:4rem; }
+
+/* headings & cards */
+.projects-container h2{ font-size:2rem; margin-bottom:2rem; color: var(--blue); }
+.projects-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2rem; }
+
+.project-card{
+  background-color:#fff; padding:1rem; border-radius:10px; border:1px solid var(--blue);
+  box-shadow:0 0 6px rgba(0,0,0,.05);
+  transition: transform .2s ease, box-shadow .2s ease;
+  text-align: center;
+}
+.project-card:hover{ transform:translateY(-5px); box-shadow:0 0 12px rgba(0,51,102,.1); }
+.project-card img{ width:100%; height:auto; border-radius:6px; margin-bottom:1rem; box-shadow:0 0 4px rgba(0,0,0,.05); }
+.project-card h3{ font-size:1.2rem; color: var(--blue); margin-bottom:.8rem; }
+.project-card p{ font-size:.95rem; color: var(--blue); }
+
+.project-summary{ font-weight:600; font-style:italic; margin-top:.8rem; }
+
+/* Forgotten project */
+.forgotten-project{
+  padding:4rem 2rem; background-color:#f8f9fa; border-top:1px solid #ccc; border-bottom:1px solid #ccc;
+}
+.forgotten-flex{
+  display:flex; gap:2rem; max-width:1200px; margin:0 auto; align-items:center; flex-wrap:wrap;
+}
+.forgotten-image{ flex:1 1 40%; min-width:300px; }
+.forgotten-image img{ width:100%; height:auto; border-radius:8px; box-shadow:0 0 6px rgba(0,0,0,.05); }
+.forgotten-content{ flex:1 1 55%; text-align:left; }
+.forgotten-content h2{ font-size:1.8rem; color: var(--blue); margin-bottom:1rem; }
+.forgotten-content p{ font-size:1.05rem; line-height:1.6; margin-bottom:1rem; }
+.forgotten-content .project-summary{ font-weight:600; font-style:italic; margin-bottom:1.2rem; }
+
+/* Final thanks */
+.final-thanks{
+  padding:4rem 2rem; background-color:#fff; text-align:center; border-top:2px solid var(--blue);
+}
+.thanks-container{ max-width:900px; margin:0 auto; }
+.final-thanks h2{ font-size:1.8rem; color: var(--blue); margin-bottom:1rem; }
+.final-thanks p{ font-size:1.05rem; line-height:1.6; margin-bottom:1.5rem; }
+
+/* Mobile quote (hidden by default) */
+.mobile-quote-only{ display:none; text-align:left; background:#fff; color: var(--blue); font-family:'Freehand', cursive; font-size:1.1rem; padding:1.2rem 1rem 0; border-bottom:1px solid #ccc; }
+.mobile-quote-only .sub-line{ font-family:'Freehand', cursive; font-size:1.3rem; font-weight:500; color:#B31942; display:block; text-align:right; }
+
+.top-left-mobile{ display:none; }
+
+/* Bring to Life */
+.bring-to-life{
+  background-color:#f9f9f9; padding:3rem 1rem; border-top:1px solid var(--blue); border-bottom:1px solid var(--blue); text-align:center;
+}
+.bring-to-life h2{ font-size:1.8rem; margin:0 auto 1rem; max-width:1200px; padding-bottom:2rem; }
+.bring-to-life p{ margin:0 auto 1.5rem; max-width:1200px; }
+
+/* Responsive Image Row */
+.philosophy-image-row{
+  display:flex; flex-wrap:wrap; gap:1rem; margin-top:2rem; justify-content:center;
+}
+.philosophy-image-row img{
+  flex:1 1 45%; max-width:100%; height:auto; border-radius:8px;
+}
+
+/*================================================== MOBILE MAIN ==================================================*/
+@media (max-width: 700px){
+  .hero{ margin-top:1px; padding-left:5px; padding-right:5px; }
+  .hero-line{ margin-top:10px; }
+  .hero-image{ width:100%; overflow:hidden; }
+  .hero-image img{ width:100%; height:auto; display:block; border-radius:5px; }
+
+  .top-left-mobile{
+    display:block; padding:0; margin:0 auto; max-width:480px; font-family:'Freehand'; gap:1rem;
+  }
+  .quote-block-mobile{
+    display:flex; flex-direction:column; gap:.25rem; font-size:1.2rem; line-height:1.5; text-align:left; font-style:italic;
+    padding-top:3rem; border-bottom:1px solid var(--blue); padding-bottom:2rem;
+  }
+  .quote-left-top{ font-weight:400; }
+  .quote-left-bottom{ font-weight:400; margin-left:.5rem; }
+  .quote-right{
+    align-self:flex-end; white-space:nowrap; padding-top:1rem; padding-right:1rem; margin-top:.5rem;
+    font-weight:600; font-style:normal; text-align:right; color:var(--red);
+  }
+
+  .rnd-section{ padding-left:5px; padding-right:5px; }
+  .project-row.double{ flex-direction:column; }
+  .project-tile.half{ width:auto; flex:1 1 100%; }
+
+  .concepts-preview{ padding-left:5px; padding-right:5px; }
+  .projects-preview{ padding-left:5px; padding-right:5px; }
+
+  .philosophy-quote{
+    padding-left:2rem; padding-right:2rem;
+    font-family: system-ui, sans-serif; font-size:1.8rem; color: var(--blue); margin:0 auto 1rem; line-height:1.6; text-align:center;
+  }
+  .philosophy-signature{ font-size:1rem; margin-bottom:2rem; font-style:italic; text-align:center; }
+
+  .forgotten-flex{ flex-direction:column; }
+  .forgotten-content{ text-align:center; }
+
+  .philosophy-image-row{ flex-direction:column; align-items:center; }
+  .philosophy-image-row img{ flex:none; width:100%; }
+}
+/*================================================== END MOBILE MAIN ==================================================*/
+
+/*================================================== END MAIN CONTENT ==================================================*/
+
+nav[aria-label="Primary"] .submenu{
+  min-width: 220px;
+  max-width: calc(100vw - 32px);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width:700px){
+  nav[aria-label="Primary"] .submenu a{ white-space: normal; }
+}
+
+@media (min-width:701px){
+  nav[aria-label="Primary"] .submenu{
+    inset-inline-end: 0; inset-inline-start: auto;  /* replaces right/left */
+  }
+}
+
+html, body { overflow-x: clip; }
+
+body:has(#menu-toggle:checked){ overflow:hidden; }
+
+html { scrollbar-gutter: stable; }
+
+/*===================================================DESKTOP / TABLET MENU PATCH ORIENTATION SUBMENU==================================================*/
+
+/* Tablet fix: make dropdowns anchor to the left edge (so they open to the right) */
+@media (min-width:701px),
+       (min-width:701px) and (pointer: coarse){
+  nav[aria-label="Primary"] .submenu{
+    left: 0;           /* fallback */
+    right: auto;       /* fallback */
+    inset-inline-start: 0;    /* logical props */
+    inset-inline-end: auto;   /* logical props */
+    transform-origin: top left;
+  }
+}
+
+/* Optional safety net so a wide menu never pushes the viewport */
+@media (min-width:701px) {
+  nav[aria-label="Primary"] .submenu{
+    max-width: min(92vw, 420px);
+    overflow:auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+/* Flip the last TWO root items so their submenus open inward (to the left) */
+@media (min-width:701px){
+  nav[aria-label="Primary"] > ul > li.has-sub:nth-last-child(-n+2) > .submenu{
+    right: 0;               /* anchor submenu to the root's right edge */
+    left: auto;
+    inset-inline-end: 0;    /* logical twin */
+    inset-inline-start: auto;
+    transform-origin: top right;
+  }
+}
+
+/* If you also have the tablet/touch override that anchors submenus to the LEFT,
+   add this so the last two still flip inward on those devices too */
+@media (min-width:701px),
+       (min-width:701px) and (pointer: coarse){
+  nav[aria-label="Primary"] > ul > li.has-sub:nth-last-child(-n+2) > .submenu{
+    right: 0;
+    left: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    transform-origin: top right;
+  }
+}
+
+/*================================================END DESKTOP / TABLET MENU PATCH ORIENTATION SUBMENU==================================================*/
+
+/*=================================================== END CSS ==================================================*/
+
+/*=================================================== BRANDS / MARCAS PAGE ==================================================*/
+
+/* ======== Mobile (≤700px) ======== */
+@media (max-width: 700px) {
+  .brands-page { color: var(--blue); padding: 10px 0; }
+
+  .brands-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 10px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+
+  .brands-header { margin: 0 0 10px 0; }
+  .brands-header h1 { margin: 0; font: 750 22px/1.2 system-ui, sans-serif; }
+  .brands-header .intro { margin: 0; font: 400 14px/1.4 system-ui, sans-serif; }
+
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr)); /* 3 per fila */
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .brand-item { margin: 0; }
+
+  .brand-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #d6d6d6 inset;
+    padding: 5px;
+    min-height: 110px; /* sin aspect-ratio */
+  }
+
+  .brand-card img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .brand-name {
+    font: 800 14px/1.2 system-ui, sans-serif;
+    text-align: center;
+    overflow-wrap: anywhere;
+    padding-top: 15px;
+    padding-bottom: 10px;
+  }
+
+  .no-brands { margin: 8px 0 0; font: 400 14px/1.4 system-ui, sans-serif; }
+}
+
+/* ======== Desktop (≥701px) ======== */
+@media (min-width: 701px) {
+  .brand-card:hover { box-shadow: 0 0 0 1px var(--red) inset; transform: translateY(-1px); }
+  .brand-card:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+
+  .brands-page { color: var(--blue); padding: 24px 0; }
+
+  .brands-container {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1400px;
+    padding: 0 16px;
+    margin: 0 auto;
+    overflow-x: hidden;
+  }
+
+  .brands-header { margin: 0 0 20px 0; }
+  .brands-header h1 { margin: 0; font: 750 32px/1.15 system-ui, sans-serif; }
+  .brands-header .intro { margin: 0; font: 400 16px/1.5 system-ui, sans-serif; }
+
+  .brand-grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr)); /* 6 por fila */
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .brand-item { margin: 0; }
+
+  .brand-card {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 0 1px #d6d6d6 inset;
+    padding: 5px;
+    min-height: 130px; /* sin aspect-ratio */
+  }
+
+  .brand-card img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .brand-name {
+    font: 700 15px/1.2 system-ui, sans-serif;
+    text-align: center;
+    overflow-wrap: anywhere;
+    padding-top: 10px;
+    padding-bottom: 15px;
+  }
+
+  .no-brands { margin: 8px 0 0; font: 400 15px/1.5 system-ui, sans-serif; }
+}
+
+/* ======== Mobile (≤700px) ======== */
+@media (max-width: 700px) {
+  .brand-disclaimer {
+    margin: 12px 0 0;          /* único lugar con márgenes */
+    padding-top: 8px;          /* único lugar con padding */
+    border-top: 1px solid rgba(0,0,0,.10);
+    font: 400 13px/1.45 system-ui, sans-serif;
+    color: var(--blue);            /* tono discreto */
+    text-wrap: pretty;
+    font-style: italic;
+  }
+}
+
+/* ======== Desktop (≥701px) ======== */
+@media (min-width: 701px) {
+  .brand-disclaimer {
+    margin: 16px 0 0;          /* único lugar con márgenes */
+    padding-top: 10px;         /* único lugar con padding */
+    border-top: 1px solid rgba(0,0,0,.12);
+    font: 400 14px/1.5 system-ui, sans-serif;
+    color: var(--blue);
+    text-wrap: pretty;
+        font-style: italic;
+  }
+}
+/*=================================================== END BRANDS / MARCAS PAGE ==================================================*/
